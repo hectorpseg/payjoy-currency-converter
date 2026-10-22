@@ -13,4 +13,16 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY composer.json composer.lock ./
+COPY bin /app/bin/
+COPY config /app/config/
+COPY public /app/public/
+COPY src /app/src/
+
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --no-progress
+
+RUN touch /app/.env
+
 CMD php -S 0.0.0.0:${PORT:-8000} -t public
