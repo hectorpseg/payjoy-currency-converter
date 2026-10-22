@@ -19,7 +19,7 @@ class ExchangeRateClientTest extends TestCase
             'conversion_rates' => ['EUR' => 0.85],
         ]);
 
-        self::assertSame(0.85, $client->fetchRate('EUR'));
+        self::assertSame('0.85', $client->fetchRate('EUR'));
     }
 
     public function testFetchRateThrowsWhenProviderReportsUnsuccessfulResult(): void

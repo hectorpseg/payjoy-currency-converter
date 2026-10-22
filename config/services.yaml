@@ -1,18 +1,16 @@
 parameters:
     exchange_rate_api_url: '%env(EXCHANGE_RATE_API_URL)%'
     exchange_rate_api_key: '%env(EXCHANGE_RATE_API_KEY)%'
-    exchange_rate_api_timeout: '%env(default:5:int:EXCHANGE_RATE_API_TIMEOUT)%'
+    exchange_rate_api_timeout: '%env(int:EXCHANGE_RATE_API_TIMEOUT)%'
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
-
-    App\Client\ExchangeRateClient:
-        arguments:
-            $apiUrl: '%exchange_rate_api_url%'
-            $apiKey: '%exchange_rate_api_key%'
-            $timeout: '%exchange_rate_api_timeout%'
+        bind:
+            string $apiUrl: '%exchange_rate_api_url%'
+            string $apiKey: '%exchange_rate_api_key%'
+            int $timeout: '%exchange_rate_api_timeout%'
 
     App\:
         resource: '../src/'

@@ -20,7 +20,7 @@ class ExchangeRateClient
     ) {
     }
 
-    public function fetchRate(string $currency): float
+    public function fetchRate(string $currency): string
     {
         $url = sprintf(
             '%s/%s/latest/%s',
@@ -61,6 +61,6 @@ class ExchangeRateClient
             );
         }
 
-        return (float) $data['conversion_rates'][$currency];
+        return (string) $data['conversion_rates'][$currency];
     }
 }
