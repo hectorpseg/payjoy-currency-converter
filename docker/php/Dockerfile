@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     libcurl4-openssl-dev \
-    && docker-php-ext-install intl zip curl \
+    && docker-php-ext-install intl zip curl bcmath \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
