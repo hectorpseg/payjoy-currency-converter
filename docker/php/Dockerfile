@@ -12,3 +12,5 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
+
+CMD php -S 0.0.0.0:${PORT:-8000} -t public
