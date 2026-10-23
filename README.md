@@ -335,4 +335,9 @@ request:
 curl 'https://currency-converter-demo.onrender.com/convert?amount=200&currency=BRL'
 ```
 
+**Deployment note:** The demo is hosted on Render's free tier, so the service
+may spin down after inactivity. The first request after inactivity can take
+longer while the service starts up. This is a limitation of the demo hosting
+environment rather than the application itself.
+
 Provider rates and deployment availability may change.
