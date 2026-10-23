@@ -49,7 +49,7 @@ Do not introduce:
 - queues
 - microservices
 - an LLM
-- a frontend
+- a frontend expansion
 
 unless a concrete requirement emerges.
 
