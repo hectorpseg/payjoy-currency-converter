@@ -18,6 +18,7 @@ class LandbotControllerTest extends WebTestCase
 
         $content = (string) $client->getResponse()->getContent();
 
+        self::assertStringContainsString('<link rel="icon" type="image/png" href="/favicon.png">', $content);
         self::assertStringContainsString('https://cdn.landbot.io/landbot-3/landbot-3.0.0.mjs', $content);
         self::assertStringContainsString('https://storage.googleapis.com/landbot.online/v3/H-3537829-6X9YPV6SP7UC7WBO/index.json', $content);
         self::assertStringContainsString('Landbot.Fullpage', $content);
