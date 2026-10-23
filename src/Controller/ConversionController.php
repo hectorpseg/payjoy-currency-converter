@@ -59,7 +59,7 @@ class ConversionController extends AbstractController
             return 'amount is required.';
         }
 
-        if (!preg_match('/^\d+(\.\d{1,6})?$/', $amount)) {
+        if (!preg_match('/\A\d+(?:\.\d{1,6})?\z/', $amount)) {
             return 'amount must be a non-negative decimal number with up to 6 decimal places.';
         }
 

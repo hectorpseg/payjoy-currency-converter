@@ -22,6 +22,28 @@ class ExchangeRateClientTest extends TestCase
         self::assertSame('0.85', $client->fetchRate('EUR'));
     }
 
+    public function testFetchRatePreservesDecimalPrecisionFromJsonNumber(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse('{"result":"success","conversion_rates":{"EUR":0.3400000000006}}'),
+        ]);
+
+        $client = new ExchangeRateClient($httpClient, 'https://api.example.com', 'key', 5);
+
+        self::assertSame('0.3400000000006', $client->fetchRate('EUR'));
+    }
+
+    public function testFetchRateExpandsScientificNotationWithoutUsingFloats(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse('{"result":"success","conversion_rates":{"EUR":1.25e-7}}'),
+        ]);
+
+        $client = new ExchangeRateClient($httpClient, 'https://api.example.com', 'key', 5);
+
+        self::assertSame('0.000000125', $client->fetchRate('EUR'));
+    }
+
     public function testFetchRateThrowsWhenProviderReportsUnsuccessfulResult(): void
     {
         $client = $this->createClient([

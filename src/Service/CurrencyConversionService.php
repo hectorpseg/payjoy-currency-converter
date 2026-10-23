@@ -8,7 +8,7 @@ use App\Client\ExchangeRateClient;
 
 class CurrencyConversionService
 {
-    private const int SCALE = 10;
+    private const int OUTPUT_SCALE = 3;
 
     public function __construct(
         private readonly ExchangeRateClient $exchangeRateClient,
@@ -27,17 +27,43 @@ class CurrencyConversionService
                 'amount_usd' => $amount,
                 'currency' => $currency,
                 'rate' => '1',
-                'converted' => $amount,
+                'converted' => $this->normalizeDecimal(
+                    bcround($amount, self::OUTPUT_SCALE, \RoundingMode::HalfAwayFromZero),
+                ),
             ];
         }
 
         $rate = $this->exchangeRateClient->fetchRate($currency);
+        $scale = $this->decimalPlaces($amount) + $this->decimalPlaces($rate);
+        $converted = bcmul($amount, $rate, $scale);
 
         return [
             'amount_usd' => $amount,
             'currency' => $currency,
             'rate' => $rate,
-            'converted' => bcmul($amount, $rate, self::SCALE),
+            'converted' => $this->normalizeDecimal(
+                bcround($converted, self::OUTPUT_SCALE, \RoundingMode::HalfAwayFromZero),
+            ),
         ];
+    }
+
+    private function decimalPlaces(string $value): int
+    {
+        $decimalPoint = strpos($value, '.');
+
+        return $decimalPoint === false ? 0 : strlen($value) - $decimalPoint - 1;
+    }
+
+    private function normalizeDecimal(string $value): string
+    {
+        $negative = str_starts_with($value, '-');
+        $unsignedValue = $negative ? substr($value, 1) : $value;
+        [$integer, $fraction] = array_pad(explode('.', $unsignedValue, 2), 2, '');
+        $integer = ltrim($integer, '0');
+        $integer = $integer === '' ? '0' : $integer;
+        $fraction = rtrim($fraction, '0');
+        $normalized = $integer . ($fraction === '' ? '' : '.' . $fraction);
+
+        return $negative && $normalized !== '0' ? '-' . $normalized : $normalized;
     }
 }
