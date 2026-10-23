@@ -2,6 +2,7 @@ parameters:
     exchange_rate_api_url: '%env(EXCHANGE_RATE_API_URL)%'
     exchange_rate_api_key: '%env(EXCHANGE_RATE_API_KEY)%'
     exchange_rate_api_timeout: '%env(int:EXCHANGE_RATE_API_TIMEOUT)%'
+    landbot_config_url: 'https://storage.googleapis.com/landbot.online/v3/H-3537829-6X9YPV6SP7UC7WBO/index.json'
 
 services:
     _defaults:
@@ -11,6 +12,7 @@ services:
             string $apiUrl: '%exchange_rate_api_url%'
             string $apiKey: '%exchange_rate_api_key%'
             int $timeout: '%exchange_rate_api_timeout%'
+            string $landbotConfigUrl: '%landbot_config_url%'
 
     App\:
         resource: '../src/'
