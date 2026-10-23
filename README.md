@@ -2,6 +2,10 @@
 
 PHP REST API that converts USD amounts into a requested target currency.
 
+The API's `converted` output is calculated with BCMath and rounded to a maximum
+of three decimal places using half-away-from-zero rounding. Trailing zeros are
+removed, and values always use plain decimal notation.
+
 ## Requirements
 
 - Docker

@@ -17,7 +17,7 @@ class ConversionControllerTest extends WebTestCase
         $this->mockConversionService($client, '100.00', 'EUR', [
             'amount_usd' => '100.00',
             'currency' => 'EUR',
-            'converted' => '85.0000000000',
+            'converted' => '85',
             'rate' => '0.85',
         ]);
 
@@ -27,7 +27,7 @@ class ConversionControllerTest extends WebTestCase
         self::assertJsonStringEqualsJsonString(json_encode([
             'amount_usd' => '100.00',
             'currency' => 'EUR',
-            'converted' => '85.0000000000',
+            'converted' => '85',
             'rate' => '0.85',
         ]), (string) $client->getResponse()->getContent());
     }
@@ -38,7 +38,7 @@ class ConversionControllerTest extends WebTestCase
         $this->mockConversionService($client, '50.00', 'USD', [
             'amount_usd' => '50.00',
             'currency' => 'USD',
-            'converted' => '50.00',
+            'converted' => '50',
             'rate' => '1',
         ]);
 
@@ -48,7 +48,7 @@ class ConversionControllerTest extends WebTestCase
         self::assertJsonStringEqualsJsonString(json_encode([
             'amount_usd' => '50.00',
             'currency' => 'USD',
-            'converted' => '50.00',
+            'converted' => '50',
             'rate' => '1',
         ]), (string) $client->getResponse()->getContent());
     }
@@ -98,6 +98,46 @@ class ConversionControllerTest extends WebTestCase
         self::assertErrorResponse($client, 'amount must be a non-negative decimal number');
     }
 
+    public function testScientificNotationAmountReturnsBadRequest(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/convert?amount=1e309&currency=EUR');
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        self::assertErrorResponse($client, 'amount must be a non-negative decimal number');
+    }
+
+    public function testAmountWithTrailingNewlineReturnsBadRequest(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/convert?amount=100%0A&currency=EUR');
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        self::assertErrorResponse($client, 'amount must be a non-negative decimal number');
+    }
+
+    public function testLargeAmountWithinDecimalRulesIsAcceptedWithoutPrecisionLoss(): void
+    {
+        $client = static::createClient();
+        $amount = '999999999999999999999999.000001';
+        $this->mockConversionService($client, $amount, 'EUR', [
+            'amount_usd' => $amount,
+            'currency' => 'EUR',
+            'converted' => '1999999999999999999999998',
+            'rate' => '2',
+        ]);
+
+        $client->request('GET', '/convert?amount=' . $amount . '&currency=EUR');
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        self::assertJsonStringEqualsJsonString(json_encode([
+            'amount_usd' => $amount,
+            'currency' => 'EUR',
+            'converted' => '1999999999999999999999998',
+            'rate' => '2',
+        ]), (string) $client->getResponse()->getContent());
+    }
+
     public function testInvalidCurrencyFormatReturnsBadRequest(): void
     {
         $client = static::createClient();
@@ -113,7 +153,7 @@ class ConversionControllerTest extends WebTestCase
         $this->mockConversionService($client, '100.00', 'EUR', [
             'amount_usd' => '100.00',
             'currency' => 'EUR',
-            'converted' => '85.0000000000',
+            'converted' => '85',
             'rate' => '0.85',
         ]);
 
@@ -123,7 +163,7 @@ class ConversionControllerTest extends WebTestCase
         self::assertJsonStringEqualsJsonString(json_encode([
             'amount_usd' => '100.00',
             'currency' => 'EUR',
-            'converted' => '85.0000000000',
+            'converted' => '85',
             'rate' => '0.85',
         ]), (string) $client->getResponse()->getContent());
     }

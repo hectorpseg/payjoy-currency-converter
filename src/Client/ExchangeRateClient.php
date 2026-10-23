@@ -42,6 +42,7 @@ class ExchangeRateClient
                 );
             }
 
+            $body = $response->getContent();
             $data = $response->toArray();
         } catch (ExceptionInterface $e) {
             throw new ExchangeRateProviderException(
@@ -55,12 +56,23 @@ class ExchangeRateClient
             throw new ExchangeRateProviderException('ExchangeRate API returned an unsuccessful result.');
         }
 
-        if (!isset($data['conversion_rates'][$currency]) || !is_numeric($data['conversion_rates'][$currency])) {
+        if (
+            !isset($data['conversion_rates'])
+            || !is_array($data['conversion_rates'])
+            || !array_key_exists($currency, $data['conversion_rates'])
+        ) {
             throw new ExchangeRateProviderException(
                 sprintf('Exchange rate for currency "%s" is missing or unusable.', $currency),
             );
         }
 
-        return (string) $data['conversion_rates'][$currency];
+        $rate = ExchangeRateParser::extract($body, $currency);
+        if ($rate === null) {
+            throw new ExchangeRateProviderException(
+                sprintf('Exchange rate for currency "%s" is missing or unusable.', $currency),
+            );
+        }
+
+        return $rate;
     }
 }
